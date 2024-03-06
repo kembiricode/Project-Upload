@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+</head>
+<body>
+  <!--<input type="file" id="fileUpload" accept="images/*">-->
+  <input type="file" id="fileUpload" accept="*">
+  <button onclick="uploadFile()">Upload</button>
+  <div id="progress"></div>
+  <div id="downloadURL"></div>
+  <script>
+// Initialize Firebase
+
+    const firebaseConfig = {
+  apiKey: "xxx",
+  authDomain: "xxx",
+  databaseURL: "xxx",
+  projectId: "pluspengujian",
+  storageBucket: "xxx",
+  messagingSenderId: "xxx",
+  appId: "xxx",
+  measurementId: "xxx"
+};
+  
+firebase.initializeApp(firebaseConfig);
+
+const storage = firebase.storage();
+const storageRef = storage.ref();
+
+function uploadFile() {
+  const file = document.getElementById("fileUpload").files[0];
+  /*const fileName = file.name;
+  const fileRef = storageRef.child(fileName);*/
+  const fileName = 'sementara/' + file.name;
+const fileRef = storageRef.child(fileName);
+  const uploadTask = fileRef.put(file);
+
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      // Update progress bar
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      document.getElementById("progress").innerText = `Upload progress: ${progress}%`;
+    },
+    (error) => {
+      // Handle errors
+      console.error("Upload error:", error);
+    },
+    () => {
+      // Upload success
+      uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+        // Display download URL
+        document.getElementById("downloadURL").innerHTML = `<a href="${downloadURL}" target="_blank">Tampilkan file</a>`;
+      });
+    }
+  );
+}
+  </script>
+</body>
+</html>
